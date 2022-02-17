@@ -1,31 +1,30 @@
 pipeline {
     agent any
-
-    stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
     
-        stage ("terraform init") {
+stages {
+    stage ('Git-checkout') {
+    steps {
+        checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/rasakilukumon02hub/terraform-ec2.git']]])
+    }
+  }
+    
+        stage ("Init") {
             steps {
                 sh ("terraform init -reconfigure") 
             }
         }
         
-        stage ("plan") {
+        stage ("Plan") {
             steps {
                 sh ('terraform plan') 
             }
         }
 
-        stage (" Action") {
+        stage ("Apply") {
             steps {
                 echo "Terraform action is --> ${action}"
-                sh ('terraform ${action} --auto-approve') 
+                sh ('terraform apply --auto-approve') 
            }
         }
     }
 }
-    
